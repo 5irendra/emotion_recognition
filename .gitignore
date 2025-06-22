@@ -1,0 +1,8 @@
+audio/
+*.wav
+*.mp3
+__pycache__/
+*.pkl
+*.h5
+.env
+.DS_Store
