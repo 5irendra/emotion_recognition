@@ -2,39 +2,38 @@ import streamlit as st
 import numpy as np
 import librosa
 import joblib
-import os
+import io
 
-
+# Page configuration
 st.set_page_config(page_title="Speech Emotion Recognition")
 
+# Load model and label encoder
 model = joblib.load("final_emotion_model.pkl")
 label_encoder = joblib.load("label_encoder.pkl")
 
-
-def extract_feature(file_name, mfcc=True, chroma=False, mel=False):
-    X, sample_rate = librosa.load(os.path.join(file_name), res_type='kaiser_fast')
-     
-    if chroma:
-        stft = np.abs(librosa.stft(X))
+# Feature extraction function
+def extract_feature(uploaded_file, mfcc=True, chroma=True, mel=True):
     result = np.array([])
+
+    # Load audio file from memory
+    audio_data, sample_rate = librosa.load(uploaded_file, res_type='kaiser_fast')
+
+    if chroma:
+        stft = np.abs(librosa.stft(audio_data))
+
     if mfcc:
-        mfccs = librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=40)
+        mfccs = librosa.feature.mfcc(y=audio_data, sr=sample_rate, n_mfcc=40)
         mfccs_mean = np.mean(mfccs.T, axis=0)
-
-        
-        delta = librosa.feature.delta(mfccs)
-        delta_mean = np.mean(delta.T, axis=0)
-
-        mfcc_combined = np.hstack((mfccs_mean, delta_mean))
         result = np.hstack((result, mfccs_mean))
+
     if chroma:
         chroma = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T, axis=0)
         result = np.hstack((result, chroma))
+
     if mel:
-        mel = np.mean(librosa.feature.melspectrogram(y=X, sr=sample_rate).T, axis=0)
+        mel = np.mean(librosa.feature.melspectrogram(y=audio_data, sr=sample_rate).T, axis=0)
         result = np.hstack((result, mel))
 
-    
     return result
 
 # Streamlit UI
@@ -50,7 +49,6 @@ if uploaded_file is not None:
         features = extract_feature(uploaded_file, mfcc=True, chroma=True, mel=True).reshape(1, -1)
         prediction = model.predict(features)
         predicted_emotion = label_encoder.inverse_transform(prediction)[0]
-
         st.success(f"Predicted Emotion: {predicted_emotion}")
 
     except Exception as e:

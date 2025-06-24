@@ -24,11 +24,6 @@ def extract_feature(file_name, mfcc=True, chroma=False, mel=False):
         mfccs = librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=40)
         mfccs_mean = np.mean(mfccs.T, axis=0)
 
-        
-        delta = librosa.feature.delta(mfccs)
-        delta_mean = np.mean(delta.T, axis=0)
-
-        mfcc_combined = np.hstack((mfccs_mean, delta_mean))
         result = np.hstack((result, mfccs_mean))
     if chroma:
         chroma = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T, axis=0)
