@@ -1,18 +1,15 @@
-import librosa
+import streamlit as st
 import numpy as np
+import librosa
 import joblib
 import os
 
-emotions = {
-    '01': 'neutral',
-    '02': 'calm',
-    '03': 'happy',
-    '04': 'sad',
-    '05': 'angry',
-    '06': 'fearful',
-    '07': 'disgust',
-    '08': 'surprised'
-}
+
+st.set_page_config(page_title="Speech Emotion Recognition")
+
+model = joblib.load("final_emotion_model.pkl")
+label_encoder = joblib.load("label_encoder.pkl")
+
 
 def extract_feature(file_name, mfcc=True, chroma=False, mel=False):
     X, sample_rate = librosa.load(os.path.join(file_name), res_type='kaiser_fast')
@@ -40,24 +37,21 @@ def extract_feature(file_name, mfcc=True, chroma=False, mel=False):
     
     return result
 
+# Streamlit UI
+st.title("Speech Emotion Recognition")
+st.markdown("Upload a WAV audio file to detect the emotion.")
 
-model = joblib.load('final_emotion_model.pkl')
-label_encoder = joblib.load('label_encoder.pkl')
+uploaded_file = st.file_uploader("Upload audio file", type=["wav"])
 
-folder_path = 'test_folder' 
+if uploaded_file is not None:
+    st.audio(uploaded_file, format="audio/wav")
 
-print("Predicting emotions for all .wav files in folder:", folder_path)
+    try:
+        features = extract_feature(uploaded_file, mfcc=True, chroma=True, mel=True).reshape(1, -1)
+        prediction = model.predict(features)
+        predicted_emotion = label_encoder.inverse_transform(prediction)[0]
 
-for filename in os.listdir(folder_path):
-    if filename.endswith(".wav"):
-        file_path = os.path.join(folder_path, filename)
-        try:
-            features = extract_feature(file_path, mfcc=True, chroma=True, mel=True).reshape(1, -1)
-            prediction = model.predict(features)
+        st.success(f"Predicted Emotion: {predicted_emotion}")
 
-            emotion = label_encoder.inverse_transform(prediction)[0]
-
-            print(f"{filename} → Predicted Emotion: {emotion}")
-        except Exception as e:
-            print(f"Error processing {filename}: {e}")
-
+    except Exception as e:
+        st.error(f"Error: {str(e)}")
