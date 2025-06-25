@@ -101,15 +101,28 @@ MLPClassifier(hidden_layer_sizes=(512, 256, 128),
 ![image](https://github.com/user-attachments/assets/f5b98c98-e35d-417e-bdd3-3bfe30e2637d)
 
 
-## 🔗 Live Demo
+
+## 🚀 How to Use the Project
+### 🔗 Live Demo
 
 👉 [Click here to try the Speech Emotion Recognition Web App](https://emotionrecognition-yjnxnripxs3qobi47zfcgv.streamlit.app/)
 
 
-## 🎥 Demo Video
+### 🎥 Demo Video
 
 You can watch the demo video here:  
 👉 [Demo Video - Google Drive Link](https://drive.google.com/drive/folders/1FcT60dxzZ7iO8Lqwkoc_LcZzP5_XpEM1)
+
+
+### 🎧 Test the Trained Model Using Python Script
+
+You can test the trained emotion recognition model on your own audio files using the provided script.
+
+#### 1️⃣ For a single audio file:
+python predict_emotion.py --file path_to_audio.wav
+
+#### 1️⃣ For a single audio file:
+python predict_emotion.py --folder path_to_folder/
 
 
 
