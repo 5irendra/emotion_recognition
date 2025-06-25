@@ -1,6 +1,6 @@
-# 🎤 Speech Emotion Recognition using Audio Features
+# 🎤 Emotion Recognition using Audio Features
 
-This project implements a **Speech Emotion Recognition (SER)** system using the RAVDESS dataset. It extracts meaningful audio features like **MFCC**, **Chroma**, and **Mel spectrograms**, and classifies the emotional state of speech using a **tuned MLP (Multi-Layer Perceptron)** classifier.
+This project implements a **Emotion Recognition (SER)** system using the RAVDESS dataset. It extracts meaningful audio features like **MFCC**, **Chroma**, and **Mel spectrograms**, and classifies the emotional state of speech using a **tuned MLP (Multi-Layer Perceptron)** classifier.
 
 ---
 
@@ -35,11 +35,24 @@ This project implements a **Speech Emotion Recognition (SER)** system using the 
 
 ## 🎛️ Feature Extraction
 
-Features were extracted from `.wav` files using `librosa`:
+Features were extracted from .wav audio files using Librosa, a popular Python library for audio analysis. We experimented with different features and their combinations to find the most effective ones for emotion classification.
 
-- **MFCC** (40 coefficients)
-- **Chroma features**
-- **Mel spectrogram**
+🔍 Features we used:
+
+  - MFCC (Mel Frequency Cepstral Coefficients) – 40 coefficients
+  - Chroma Features – capturing pitch and tone information
+  - Mel Spectrogram – representing frequency content over time
+
+We also experimented with other features such as:
+
+  - Delta and Delta-Delta MFCCs (showing change over time)
+  - Spectral Features (like spectral centroid, rolloff, bandwidth)
+  - Zero Crossing Rate, etc.
+
+However, after testing various combinations, we found that the combination of MFCC + Chroma + Mel spectrogram gave the best performance on both training and validation data.
+Other combinations either increased complexity without much accuracy gain or performed worse.
+
+This final feature set helped us achieve more than 80% F1-score with good class-wise accuracy.
 
 ---
 
