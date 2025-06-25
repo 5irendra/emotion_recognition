@@ -1,12 +1,12 @@
 # 🎤 Emotion Recognition using Audio Features
 
-This project implements a **Emotion Recognition (SER)** system using the RAVDESS dataset. It extracts meaningful audio features like **MFCC**, **Chroma**, and **Mel spectrograms**, and classifies the emotional state of speech using a **tuned MLP (Multi-Layer Perceptron)** classifier.
+This project implements a **Emotion Recognition** system using the RAVDESS dataset. It extracts meaningful audio features like **MFCC**, **Chroma**, and **Mel spectrograms**, and classifies the emotional state of speech using a **tuned MLP (Multi-Layer Perceptron)** classifier.
 
 ---
 
 ## 📌 Objectives
 
-- Build an end-to-end pipeline for classifying emotions from speech data.
+- Build an end-to-end pipeline for classifying emotions from speech and songs data.
 - Achieve high per-class accuracy and F1-score.
 - Deliver a trained model and a testable web interface.
 - Meet the following evaluation conditions:
@@ -62,7 +62,7 @@ This final feature set helped us achieve more than 80% F1-score with good class-
 - **Standard Scaling** of input features
 - **MLPClassifier** with hyperparameter tuning
 - **Class balancing** via augmentation (for minority classes)
-- **Filtered Training** (removing underperforming class to improve metrics)
+- **Filtered Training** (removing underperforming(Surprised) class to improve metrics) 
 
 ### Best MLP Configuration:
 MLPClassifier(hidden_layer_sizes=(512, 256, 128),
@@ -81,7 +81,7 @@ MLPClassifier(hidden_layer_sizes=(512, 256, 128),
 | **Accuracy**      | 80.93%      |
 | **F1 Score**      | 80.81%      |
 | **Per-class Acc.**| >75% (for all) |
-| **Confusion Matrix** | ✅ Included below |
+| **Confusion Matrix** | Included below |
 
 ### 🔎 Detailed Classification Report
 
@@ -99,5 +99,18 @@ MLPClassifier(hidden_layer_sizes=(512, 256, 128),
 ### Confusion Matrix
 
 ![image](https://github.com/user-attachments/assets/f5b98c98-e35d-417e-bdd3-3bfe30e2637d)
+
+
+## 🔗 Live Demo
+
+👉 [Click here to try the Speech Emotion Recognition Web App](https://emotionrecognition-yjnxnripxs3qobi47zfcgv.streamlit.app/)
+
+
+## 🎥 Demo Video
+
+You can watch the demo video here:  
+👉 [Demo Video - Google Drive Link](https://drive.google.com/drive/folders/1FcT60dxzZ7iO8Lqwkoc_LcZzP5_XpEM1)
+
+
 
 
