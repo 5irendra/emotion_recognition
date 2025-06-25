@@ -1,58 +1,75 @@
+import os
+import argparse
 import librosa
 import numpy as np
 import joblib
-import os
 
-emotions = {
-    '01': 'neutral',
-    '02': 'calm',
-    '03': 'happy',
-    '04': 'sad',
-    '05': 'angry',
-    '06': 'fearful',
-    '07': 'disgust',
-    '08': 'surprised'
-}
-
-def extract_feature(file_name, mfcc=True, chroma=False, mel=False):
-    X, sample_rate = librosa.load(os.path.join(file_name), res_type='kaiser_fast')
-     
-    if chroma:
-        stft = np.abs(librosa.stft(X))
-    result = np.array([])
-    if mfcc:
-        mfccs = librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=40)
-        mfccs_mean = np.mean(mfccs.T, axis=0)
-
-        result = np.hstack((result, mfccs_mean))
-    if chroma:
-        chroma = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T, axis=0)
-        result = np.hstack((result, chroma))
-    if mel:
-        mel = np.mean(librosa.feature.melspectrogram(y=X, sr=sample_rate).T, axis=0)
-        result = np.hstack((result, mel))
-
-    
-    return result
-
-
+# Load trained model and label encoder
 model = joblib.load('final_emotion_model.pkl')
 label_encoder = joblib.load('label_encoder.pkl')
 
-folder_path = 'test_folder' 
+# Feature extractor
+def extract_feature(file_name, mfcc=True, chroma=True, mel=True):
+    X, sample_rate = librosa.load(file_name, res_type='kaiser_fast')
 
-print("Predicting emotions for all .wav files in folder:", folder_path)
+    result = np.array([])
 
-for filename in os.listdir(folder_path):
-    if filename.endswith(".wav"):
-        file_path = os.path.join(folder_path, filename)
-        try:
-            features = extract_feature(file_path, mfcc=True, chroma=True, mel=True).reshape(1, -1)
-            prediction = model.predict(features)
+    if chroma:
+        stft = np.abs(librosa.stft(X))
 
-            emotion = label_encoder.inverse_transform(prediction)[0]
+    if mfcc:
+        mfccs = librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=40)
+        result = np.hstack((result, np.mean(mfccs.T, axis=0)))
 
-            print(f"{filename} → Predicted Emotion: {emotion}")
-        except Exception as e:
-            print(f"Error processing {filename}: {e}")
+    if chroma:
+        chroma = librosa.feature.chroma_stft(S=stft, sr=sample_rate)
+        result = np.hstack((result, np.mean(chroma.T, axis=0)))
+
+    if mel:
+        mel = librosa.feature.melspectrogram(y=X, sr=sample_rate)
+        result = np.hstack((result, np.mean(mel.T, axis=0)))
+
+    return result
+
+# Predict emotion from one file
+def predict_emotion(file_path):
+    features = extract_feature(file_path).reshape(1, -1)
+    prediction = model.predict(features)
+    emotion = label_encoder.inverse_transform(prediction)[0]
+    return emotion
+
+# Main CLI
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Emotion prediction from a .wav file or a folder of .wav files")
+    parser.add_argument("--file", type=str, help="Path to a single .wav file")
+    parser.add_argument("--folder", type=str, help="Path to folder containing multiple .wav files")
+
+    args = parser.parse_args()
+
+    if args.file:
+        if args.file.endswith(".wav") and os.path.isfile(args.file):
+            print(f"Predicting emotion for: {args.file}")
+            try:
+                emotion = predict_emotion(args.file)
+                print(f"Predicted Emotion: {emotion}")
+            except Exception as e:
+                print(f"Error: {e}")
+        else:
+            print("Invalid file path. Please provide a valid .wav file.")
+
+    elif args.folder:
+        if os.path.isdir(args.folder):
+            print(f"Predicting emotions in folder: {args.folder}\n")
+            for filename in os.listdir(args.folder):
+                if filename.endswith(".wav"):
+                    file_path = os.path.join(args.folder, filename)
+                    try:
+                        emotion = predict_emotion(file_path)
+                        print(f"{filename} → {emotion}")
+                    except Exception as e:
+                        print(f"{filename} → Error: {e}")
+        else:
+            print("Folder does not exist or path is incorrect.")
+    else:
+        print("No input provided. Please use --file or --folder to specify the test data.")
 
